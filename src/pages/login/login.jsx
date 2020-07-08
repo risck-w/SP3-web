@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import './login.less'
 import logo from './images/logo.png'
 import { Form, Icon, Input, Button} from 'antd';
-
+import {reqLogin} from '../../api'
 
 /**
  * 登录的路由界面
@@ -12,13 +12,23 @@ import { Form, Icon, Input, Button} from 'antd';
 
     handleSubmit = (event) => {
 
-        // 组织事件的默认行为
+        // // 组织事件的默认行为， 解决发生canceled状态的请求
         event.preventDefault();
 
         // 获取表单项输入数据
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields(async (err, user) => {
             if(!err) {
-                console.log('进行ajax请求: ', values)
+                const {username, password} = user
+                try {
+                    const res = await reqLogin(username, password)
+                    const data = res.data
+                    alert(data.message, data.username)
+                    this.props.history.push('/admin')
+                } catch (error) {
+                    console.log('失败：', error)
+                }
+            } else {
+                console.log('检验失败')
             }
         });
     }
