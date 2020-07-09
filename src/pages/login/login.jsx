@@ -3,6 +3,9 @@ import './login.less'
 import logo from './images/logo.png'
 import { Form, Icon, Input, Button} from 'antd';
 import {reqLogin} from '../../api'
+import { message } from 'antd'
+import storageUtils from '../../utils/storageUtils'
+import { Redirect } from 'react-router-dom';
 
 /**
  * 登录的路由界面
@@ -19,13 +22,17 @@ import {reqLogin} from '../../api'
         this.props.form.validateFields(async (err, user) => {
             if(!err) {
                 const {username, password} = user
-                try {
-                    const res = await reqLogin(username, password)
-                    const data = res.data
-                    alert(data.message, data.username)
-                    this.props.history.push('/admin')
-                } catch (error) {
-                    console.log('失败：', error)
+                const result = await reqLogin(username, password)
+                if (result.status === 0){
+                    // 登录成功
+                    message.success('登录成功')
+                    // 保存对象
+                    storageUtils.saveUser(result)
+                    // this.props.history.push和repalce的区别是是否需要回退
+                    this.props.history.replace('/')
+                } else {
+                    // 登录失败
+                    message.error(result.message)
                 }
             } else {
                 console.log('检验失败')
@@ -47,8 +54,12 @@ import {reqLogin} from '../../api'
         callback()
     }
 
-
     render(){
+
+        const user = storageUtils.getUser()
+        if (user && user._id) {
+            return <Redirect to='/' />
+        }
 
         const { getFieldDecorator } = this.props.form;
 
@@ -134,3 +145,13 @@ export default WrapLogin
   * 1、前台表单验证
   * 2、收集表单输入数据
   */
+
+/**
+ * async 和 await 
+ * 1、作用？
+ * 简化promise对象的使用，不用在使用then()来指定成功/失败的回调函数
+ * 以同步编码（没有回调函数了）方式实现异步流程
+ * 2、哪里写await?
+ *  在返回promise的表达式左侧写await：不想要promise，想要promise异步执行的成功组件
+ * 3、哪里写async?
+ */
