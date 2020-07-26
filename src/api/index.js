@@ -13,3 +13,5 @@ import ajax from './ajax'
 
  // 添加用户
  export const reqAddUser = (user) => ajax('/user/add', user, 'POST')
+
+ export const reqCraw = (data) => ajax('/craw', data, 'GET')
