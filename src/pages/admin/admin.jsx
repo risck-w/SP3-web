@@ -6,8 +6,71 @@ import { message } from 'antd'
 import './admin.less'
 import { reqCraw } from '../../api'
 import { judgeType } from '../../utils/baseUtils'
+import Player from 'griffith'
+
+class Griffiths extends Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            sources: {
+                hd : {
+                    bitrate: 100,
+                    duration: 200,
+                    format: 'mp4',
+                    height: 400,
+                    width: 500,
+                    play_url: 'https://zhstatic.zhihu.com/cfe/griffith/zhihu2018_hd.mp4',
+                    size: 5000,
+                    autoplay:true
+                  }
+            },
+            __griffithId: 'video',
+            title:'题目',
+            cover:'',
+            autoplay: true,
+            duration: 0
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.sources !== nextProps.sources){
+            const sources = nextProps.sources
+            const id = nextProps.id
+            this.setState({
+                sources: sources,
+                __griffithId: id
+            })
+        }
+    }
+
+    render(){
+        return <Player 
+                    id={this.state.__griffithId} 
+                    sources={this.state.sources}
+                    title={this.state.title} 
+                    cover={this.state.cover}
+                    autoplay={this.state.autoplay}
+                    duration={this.state.duration}   
+                />
+    }
+
+
+}
 
 class Admin extends Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            title:'',
+            sources: {},
+            __griffithId: 'video',
+            cover:'',
+            autoplay: true,
+            duration: 100
+        }
+    }
 
     handleSubmit = (e) => {
         // 阻止默认事件
@@ -17,9 +80,21 @@ class Admin extends Component {
                 try {
                     const data = await reqCraw(values)
                     if (values.parseType){
-                        console.log(data.vod.music)
                         const url = await judgeType(data, values.parseType)
-                        message.info(url)
+                        const sources = {
+                            hd : {
+                                bitrate: 100,
+                                duration: 200,
+                                format: 'mp4',
+                                height: 400,
+                                width: 500,
+                                play_url: url[0],
+                                size: 5000,
+                              }
+                        }
+                        const __griffithId = 'vi'
+                        this.setState({sources, __griffithId})
+
                     }
                 } catch (err){
                     message.error(err)
@@ -27,6 +102,10 @@ class Admin extends Component {
             }
         })
     }
+
+    // componentMount (){
+    //     return <Player sources={this.state.sources} />
+    // }
 
     render() {
         const user = storageUtils.getUser()
@@ -72,6 +151,14 @@ class Admin extends Component {
                 
                 <Divider />
                 <p>解析结果</p>
+                <div>
+                    <Griffiths 
+                        id={this.state.__griffithId} 
+                        cover={this.state.cover} 
+                        sources={this.state.sources} 
+
+                        />
+                </div>
             </div>
         </div>
     }
