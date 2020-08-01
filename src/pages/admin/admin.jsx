@@ -5,7 +5,7 @@ import { Divider, Form, Radio, Button, Input} from 'antd'
 import { message } from 'antd'
 import './admin.less'
 import { reqCraw } from '../../api'
-import { judgeType } from '../../utils/baseUtils'
+import { formatData } from '../../utils/baseUtils'
 import Player from 'griffith'
 
 class Griffiths extends Component {
@@ -14,32 +14,39 @@ class Griffiths extends Component {
         super(props)
         this.state = {
             sources: {
-                hd : {
-                    bitrate: 100,
-                    duration: 200,
-                    format: 'mp4',
-                    height: 400,
-                    width: 500,
-                    play_url: 'https://zhstatic.zhihu.com/cfe/griffith/zhihu2018_hd.mp4',
-                    size: 5000,
-                    autoplay:true
+                ld: {
+                    bitrate: 0,
+                    duration: 0,
+                    format: '',
+                    height: 0,
+                    width: 0,
+                    play_url: '',
+                    size: 0
                   }
             },
-            __griffithId: 'video',
-            title:'题目',
+            __griffithId: 'fa8ddf0a-51b5-44e6-8ff0-39821a45dfdc',
+            title:'',
             cover:'',
             autoplay: true,
             duration: 0
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.sources !== nextProps.sources){
             const sources = nextProps.sources
             const id = nextProps.id
+            const title = nextProps.title
+            const cover = nextProps.cover
+            const duration = nextProps.duration
+            const autoplay = nextProps.autoplay
             this.setState({
+                title: title,
                 sources: sources,
-                __griffithId: id
+                __griffithId: id,
+                cover: cover,
+                autoplay: autoplay,
+                duration: duration
             })
         }
     }
@@ -65,7 +72,7 @@ class Admin extends Component {
         this.state = {
             title:'',
             sources: {},
-            __griffithId: 'video',
+            __griffithId: 'fa8ddf0a-51b5-44e6-8ff0-39821a45dfdc',
             cover:'',
             autoplay: true,
             duration: 100
@@ -78,34 +85,24 @@ class Admin extends Component {
         this.props.form.validateFields( async (err, values) => {
             if(!err){
                 try {
-                    const data = await reqCraw(values)
-                    if (values.parseType){
-                        const url = await judgeType(data, values.parseType)
-                        const sources = {
-                            hd : {
-                                bitrate: 100,
-                                duration: 200,
-                                format: 'mp4',
-                                height: 400,
-                                width: 500,
-                                play_url: url[0],
-                                size: 5000,
-                              }
-                        }
-                        const __griffithId = 'vi'
-                        this.setState({sources, __griffithId})
-
-                    }
+                    const result = await reqCraw(values)
+                    if (result.code === 0 && result.data){
+                        const {sources, __griffithId, title, cover, autoplay, duration} = await formatData(result.data)
+                        this.setState({
+                            sources, 
+                            __griffithId,
+                            title,
+                            cover,
+                            autoplay,
+                            duration
+                        })
+                    }                      
                 } catch (err){
                     message.error(err)
                 }
             }
         })
     }
-
-    // componentMount (){
-    //     return <Player sources={this.state.sources} />
-    // }
 
     render() {
         const user = storageUtils.getUser()
@@ -156,6 +153,9 @@ class Admin extends Component {
                         id={this.state.__griffithId} 
                         cover={this.state.cover} 
                         sources={this.state.sources} 
+                        autoplay={this.state.autoplay} 
+                        duration={this.state.duration} 
+                        title={this.state.title} 
 
                         />
                 </div>
