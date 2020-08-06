@@ -17,7 +17,7 @@ class Griffiths extends Component {
                 ld: {
                     bitrate: 0,
                     duration: 0,
-                    format: '',
+                    format: 'm3u8',
                     height: 0,
                     width: 0,
                     play_url: '',
@@ -128,9 +128,9 @@ class Admin extends Component {
                     <Form.Item>
                         { getFieldDecorator("parseType", { initialValue: "1" })(
                             <Radio.Group>
-                            <Radio value="1">点播</Radio>
-                            <Radio value="2">直播</Radio>
-                            <Radio value="3">音乐</Radio>
+                            <Radio value="vod">点播</Radio>
+                            <Radio value="live">直播</Radio>
+                            <Radio value="music">音乐</Radio>
                             </Radio.Group>
                         )}  
                     </Form.Item>
@@ -159,6 +159,7 @@ class Admin extends Component {
 
                         />
                 </div>
+                <Divider />
             </div>
         </div>
     }
