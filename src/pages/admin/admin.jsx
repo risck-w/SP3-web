@@ -4,9 +4,10 @@ import { Redirect } from 'react-router-dom'
 import { Divider, Form, Radio, Button, Input} from 'antd'
 import { message } from 'antd'
 import './admin.less'
-import { reqCraw } from '../../api'
+import { reqCraw, reqRank } from '../../api'
 import { formatData } from '../../utils/baseUtils'
 import Player from 'griffith'
+import Rank from '../utils/timeLine'
 
 class Griffiths extends Component {
 
@@ -17,7 +18,7 @@ class Griffiths extends Component {
                 ld: {
                     bitrate: 0,
                     duration: 0,
-                    format: 'm3u8',
+                    format: 'mp4',
                     height: 0,
                     width: 0,
                     play_url: '',
@@ -33,7 +34,7 @@ class Griffiths extends Component {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        if (this.props.sources !== nextProps.sources){
+        if (this.props.sources !== nextProps.sources && this.props.__griffithId !== nextProps.id){
             const sources = nextProps.sources
             const id = nextProps.id
             const title = nextProps.title
@@ -65,6 +66,8 @@ class Griffiths extends Component {
 
 }
 
+
+
 class Admin extends Component {
 
     constructor(props) {
@@ -75,9 +78,30 @@ class Admin extends Component {
             __griffithId: 'fa8ddf0a-51b5-44e6-8ff0-39821a45dfdc',
             cover:'',
             autoplay: true,
-            duration: 100
+            duration: 100,
+            isShowRank: false,
+            rankData: null
         }
     }
+
+    componentDidMount() {
+        new Promise(async (resolve, reject)=>{
+            try{
+                const rank = await reqRank()
+                
+                resolve(rank)
+            } catch (error) {
+                reject(error)
+            } 
+        }).then((result) => {
+            if (result) {
+                this.setState({isShowRank: true, rankData:result})
+            }
+        })
+    }
+
+
+
 
     handleSubmit = (e) => {
         // 阻止默认事件
@@ -120,13 +144,30 @@ class Admin extends Component {
                 <p className='lead'>随心所欲，释放你的青春</p>
             </header>
             <div className='sp3-container'>
-                <h4 className='lead'>解析类型</h4>
+                
+                {/* <h4 className='lead'>解析类型</h4> */}
 
                 <Divider />
+
+                <div className='sp3-con-form'>
+
+                <div className='sp3-container-griffiths'>
+                    <Griffiths
+                        id={this.state.__griffithId} 
+                        cover={this.state.cover} 
+                        sources={this.state.sources} 
+                        autoplay={this.state.autoplay} 
+                        duration={this.state.duration} 
+                        title={this.state.title} 
+
+                        />
+                </div>
                 
+                <div>
+
                 <Form  onSubmit={ this.handleSubmit }>
                     <Form.Item>
-                        { getFieldDecorator("parseType", { initialValue: "1" })(
+                        { getFieldDecorator("parseType", { initialValue: "vod" })(
                             <Radio.Group>
                             <Radio value="vod">点播</Radio>
                             <Radio value="live">直播</Radio>
@@ -145,22 +186,18 @@ class Admin extends Component {
                         </Button>
                     </Form.Item>
                 </Form>
-                
-                <Divider />
-                <p>解析结果</p>
-                <div>
-                    <Griffiths 
-                        id={this.state.__griffithId} 
-                        cover={this.state.cover} 
-                        sources={this.state.sources} 
-                        autoplay={this.state.autoplay} 
-                        duration={this.state.duration} 
-                        title={this.state.title} 
-
-                        />
                 </div>
-                <Divider />
+                </div>
+                <div className='sp3-container-rank' >
+                    <Rank props={this.state}/>            
+                </div>
             </div>
+            <footer>
+                <Divider />
+                <h5>
+                    @sp3版权所有
+                </h5>
+            </footer>
         </div>
     }
 }
