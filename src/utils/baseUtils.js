@@ -46,3 +46,4 @@ async function formatData(result) {
 }
 
 exports.formatData = formatData
+exports.UUID = UUID

@@ -5,9 +5,10 @@ import { Divider, Form, Radio, Button, Input} from 'antd'
 import { message } from 'antd'
 import './admin.less'
 import { reqCraw, reqRank } from '../../api'
-import { formatData } from '../../utils/baseUtils'
+import { formatData, UUID } from '../../utils/baseUtils'
 import Player from 'griffith'
 import Rank from '../utils/timeLine'
+import ContentLeft from './content'
 
 class Griffiths extends Component {
 
@@ -73,14 +74,16 @@ class Admin extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            title:'',
-            sources: {},
-            __griffithId: 'fa8ddf0a-51b5-44e6-8ff0-39821a45dfdc',
-            cover:'',
-            autoplay: true,
-            duration: 100,
+            // title:'',
+            // sources: {},
+            // __griffithId: 'fa8ddf0a-51b5-44e6-8ff0-39821a45dfdc',
+            // cover:'',
+            // autoplay: true,
+            // duration: 100,
             isShowRank: false,
-            rankData: null
+            rankData: null,
+            hotNews: {},
+            uuid: null
         }
     }
 
@@ -95,7 +98,7 @@ class Admin extends Component {
             } 
         }).then((result) => {
             if (result) {
-                this.setState({isShowRank: true, rankData:result})
+                // this.setState({isShowRank: true, rankData:result})
             }
         })
     }
@@ -111,15 +114,19 @@ class Admin extends Component {
                 try {
                     const result = await reqCraw(values)
                     if (result.code === 0 && result.data){
-                        const {sources, __griffithId, title, cover, autoplay, duration} = await formatData(result.data)
                         this.setState({
-                            sources, 
-                            __griffithId,
-                            title,
-                            cover,
-                            autoplay,
-                            duration
+                            uuid: UUID(),
+                            hotNews: result.data
                         })
+                        // const {sources, __griffithId, title, cover, autoplay, duration} = await formatData(result.data)
+                        // this.setState({
+                        //     sources, 
+                        //     __griffithId,
+                        //     title,
+                        //     cover,
+                        //     autoplay,
+                        //     duration
+                        // })
                     }                      
                 } catch (err){
                     message.error(err)
@@ -140,7 +147,7 @@ class Admin extends Component {
 
         return <div className='container'>
             <header className='admin-header'>
-                <h1>SiteParse3影视解析系统</h1>
+                <h1>SiteParse3新闻聚合系统</h1>
                 <p className='lead'>随心所欲，释放你的青春</p>
             </header>
             <div className='sp3-container'>
@@ -151,7 +158,7 @@ class Admin extends Component {
 
                 <div className='sp3-con-form'>
 
-                <div className='sp3-container-griffiths'>
+                {/* <div className='sp3-container-griffiths'>
                     <Griffiths
                         id={this.state.__griffithId} 
                         cover={this.state.cover} 
@@ -161,31 +168,37 @@ class Admin extends Component {
                         title={this.state.title} 
 
                         />
-                </div>
+                </div> */}
                 
                 <div>
 
                 <Form  onSubmit={ this.handleSubmit }>
+                    
                     <Form.Item>
-                        { getFieldDecorator("parseType", { initialValue: "vod" })(
+                        { getFieldDecorator('url', { valuePropName: 'checked', 'rules': [{required: true, message: '解析地址不能为空'}]})(
+                            <Input className='sp3-form-input' placeholder='实时热点搜索' />
+                        )}
+                        <Button type="primary" htmlType="submit">
+                            搜索
+                        </Button>
+                    </Form.Item>
+                    <Form.Item>
+                        { getFieldDecorator("parseType", { initialValue: "news" })(
                             <Radio.Group>
+                            <Radio value="news">新闻</Radio>
                             <Radio value="vod">点播</Radio>
                             <Radio value="live">直播</Radio>
                             <Radio value="music">音乐</Radio>
                             </Radio.Group>
                         )}  
                     </Form.Item>
-                    <Form.Item>
-                        { getFieldDecorator('url', { valuePropName: 'checked', 'rules': [{required: true, message: '解析地址不能为空'}]})(
-                            <Input className='sp3-form-input' placeholder='URL解析地址' />
-                        )}
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            解析
-                        </Button>
-                    </Form.Item>
                 </Form>
+                </div>
+                <div id='content_left'>
+                    <ContentLeft
+                        id={this.state.uuid}
+                        hotNews={this.state.hotNews}
+                    />
                 </div>
                 </div>
                 <div className='sp3-container-rank' >
