@@ -2,13 +2,14 @@ import React, { Component } from 'react'
 import storageUtils from '../../utils/storageUtils'
 import { Redirect } from 'react-router-dom'
 import { Divider, Form, Radio, Button, Input} from 'antd'
-import { message } from 'antd'
+import { message, Tag } from 'antd'
 import './admin.less'
-import { reqCraw, reqRank } from '../../api'
+import { reqCraw, reqRank, reqHotWebSite } from '../../api'
 import { formatData, UUID } from '../../utils/baseUtils'
 import Player from 'griffith'
 import Rank from '../utils/timeLine'
 import ContentLeft from './content'
+import _ from 'lodash'
 
 class Griffiths extends Component {
 
@@ -82,6 +83,10 @@ class Admin extends Component {
             // duration: 100,
             isShowRank: false,
             rankData: null,
+            isShowHotWebSite: false,
+            hotWebSite: null,
+            formInput: null,
+            checked: true,
             hotNews: {},
             uuid: null
         }
@@ -90,20 +95,20 @@ class Admin extends Component {
     componentDidMount() {
         new Promise(async (resolve, reject)=>{
             try{
-                const rank = await reqRank()
+                // const rank = await reqRank()
+                const hotWebSite = await reqHotWebSite()
                 
-                resolve(rank)
+                resolve(hotWebSite)
             } catch (error) {
                 reject(error)
             } 
         }).then((result) => {
             if (result) {
                 // this.setState({isShowRank: true, rankData:result})
+                this.setState({isShowHotWebSite: true, hotWebSite: result.hotWebSite})
             }
         })
     }
-
-
 
 
     handleSubmit = (e) => {
@@ -112,21 +117,20 @@ class Admin extends Component {
         this.props.form.validateFields( async (err, values) => {
             if(!err){
                 try {
+                    if (this.state.hotWebSite && this.state.isShowHotWebSite) {
+                        const hotWebSite = this.state.hotWebSite
+                        const doname = _.find(hotWebSite, {'name': values.url})
+                        if (doname) {
+                            values.url = doname.url
+                        }
+
+                    }
                     const result = await reqCraw(values)
                     if (result.code === 0 && result.data){
                         this.setState({
                             uuid: UUID(),
                             hotNews: result.data
                         })
-                        // const {sources, __griffithId, title, cover, autoplay, duration} = await formatData(result.data)
-                        // this.setState({
-                        //     sources, 
-                        //     __griffithId,
-                        //     title,
-                        //     cover,
-                        //     autoplay,
-                        //     duration
-                        // })
                     }                      
                 } catch (err){
                     message.error(err)
@@ -152,26 +156,10 @@ class Admin extends Component {
             </header>
             <div className='sp3-container'>
                 
-                {/* <h4 className='lead'>解析类型</h4> */}
-
                 <Divider />
 
-                <div className='sp3-con-form'>
-
-                {/* <div className='sp3-container-griffiths'>
-                    <Griffiths
-                        id={this.state.__griffithId} 
-                        cover={this.state.cover} 
-                        sources={this.state.sources} 
-                        autoplay={this.state.autoplay} 
-                        duration={this.state.duration} 
-                        title={this.state.title} 
-
-                        />
-                </div> */}
-                
+                <div className='sp3-con-form'>     
                 <div>
-
                 <Form  onSubmit={ this.handleSubmit }>
                     
                     <Form.Item>
@@ -202,7 +190,19 @@ class Admin extends Component {
                 </div>
                 </div>
                 <div className='sp3-container-rank' >
-                    <Rank props={this.state}/>            
+                    <h4 style={ {marginBottom: 16} }>新闻网站:</h4>
+                    { this.state.isShowHotWebSite && this.state.hotWebSite.map((item, i) => {
+                        return <Tag key={i} color={item.color} closable={true}>{item.name}</Tag>
+                    })}
+                    
+                        <h4 style={{ margin: '16px 0' }}>热点网站:</h4>
+                        <div>
+                        <Tag color="#f50">百度新闻</Tag>
+                        <Tag color="#2db7f5">#2db7f5</Tag>
+                        <Tag color="#87d068">#87d068</Tag>
+                        <Tag color="#108ee9">#108ee9</Tag>
+                        </div>
+                
                 </div>
             </div>
             <footer>
