@@ -4,12 +4,12 @@ import { Redirect } from 'react-router-dom'
 import { Divider, Form, Radio, Button, Input} from 'antd'
 import { message, Tag } from 'antd'
 import './admin.less'
-import { reqCraw, reqRank, reqHotWebSite } from '../../api'
-import { formatData, UUID } from '../../utils/baseUtils'
+import { reqCraw, reqHotWebSite } from '../../api'
+import { UUID } from '../../utils/baseUtils'
 import Player from 'griffith'
-import Rank from '../utils/timeLine'
 import ContentLeft from './content'
 import _ from 'lodash'
+import MyTag from '../../components/tag'
 
 class Griffiths extends Component {
 
@@ -191,9 +191,13 @@ class Admin extends Component {
                 </div>
                 <div className='sp3-container-rank' >
                     <h4 style={ {marginBottom: 16} }>新闻网站:</h4>
-                    { this.state.isShowHotWebSite && this.state.hotWebSite.map((item, i) => {
-                        return <Tag key={i} color={item.color} closable={true}>{item.name}</Tag>
-                    })}
+                    <div className=''>
+                        { this.state.isShowHotWebSite && this.state.hotWebSite.map((item, i) => {
+                            return <MyTag key={i} tagname={item.name} news={item}>{item.name}</MyTag>
+
+                        })}
+                    </div>
+
                     
                         <h4 style={{ margin: '16px 0' }}>热点网站:</h4>
                         <div>
@@ -202,7 +206,7 @@ class Admin extends Component {
                         <Tag color="#87d068">#87d068</Tag>
                         <Tag color="#108ee9">#108ee9</Tag>
                         </div>
-                
+
                 </div>
             </div>
             <footer>
