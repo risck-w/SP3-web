@@ -31,15 +31,17 @@ export default class MyTag extends Component {
                     search: 1
                 }
                 const result = await reqCraw(data)
-                if (result.status === 1) {
-                    description = '《'+this.state.tagname+ '》加入爬取队列成功, 正在爬取...'
-                    notification.open({
-                        key:this.key,
-                        message: '消息通知',
-                        description: description,
-                        duration: 1.5
-                      });
+                if (result.status === 0) {
+                    description = '《'+this.state.tagname+ '》加入爬取队列成功, 正在爬取...' 
+                }else {
+                    description = '《'+this.state.tagname+ '》'+ result.message 
                 }
+                notification.open({
+                    key:this.key,
+                    message: '消息通知',
+                    description: description,
+                    duration: 1.5
+                  });
             }
             
         }
