@@ -19,3 +19,5 @@ import ajax from './ajax'
  export const reqRank = () => ajax('/pageRank', null, 'GET')
 
  export const reqHotWebSite = () => ajax('/hotWebSite', null, 'GET')
+
+ export const reqWordCloud = () => ajax('/wordCloud', null, 'GET')

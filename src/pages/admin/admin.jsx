@@ -10,6 +10,8 @@ import Player from 'griffith'
 import ContentLeft from './content'
 import _ from 'lodash'
 import MyTag from '../../components/tag'
+import WordCloud from '../../components/wordCloud'
+
 
 class Griffiths extends Component {
 
@@ -206,6 +208,9 @@ class Admin extends Component {
                         <Tag color="#87d068">#87d068</Tag>
                         <Tag color="#108ee9">#108ee9</Tag>
                         </div>
+                    
+                    <h4 style={{ margin: '16px 0' } }>热点词汇:</h4>
+                    <WordCloud></WordCloud>
 
                 </div>
             </div>
