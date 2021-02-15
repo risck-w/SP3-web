@@ -21,3 +21,5 @@ import ajax from './ajax'
  export const reqHotWebSite = () => ajax('/hotWebSite', null, 'GET')
 
  export const reqWordCloud = () => ajax('/wordCloud', null, 'GET')
+
+ export const reqTopHotWebSite = () => ajax('/topHotWebSite', null, 'GET')

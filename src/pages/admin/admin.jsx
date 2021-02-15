@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom'
 import { Divider, Form, Radio, Button, Input} from 'antd'
 import { message, Tag } from 'antd'
 import './admin.less'
-import { reqCraw, reqHotWebSite } from '../../api'
+import { reqCraw, reqHotWebSite, reqTopHotWebSite } from '../../api'
 import { UUID } from '../../utils/baseUtils'
 import Player from 'griffith'
 import ContentLeft from './content'
@@ -87,6 +87,8 @@ class Admin extends Component {
             rankData: null,
             isShowHotWebSite: false,
             hotWebSite: null,
+            isShowTopHotWebSite: false,
+            topHotWebSite: null,
             formInput: null,
             checked: true,
             hotNews: {},
@@ -110,6 +112,20 @@ class Admin extends Component {
                 this.setState({isShowHotWebSite: true, hotWebSite: result.hotWebSite})
             }
         })
+
+        new Promise(async (resolve, reject)=>{
+            try{
+                const topHotWebSite = await reqTopHotWebSite()
+                resolve(topHotWebSite)
+            } catch (error) {
+                reject(error)
+            } 
+        }).then((result) => {
+            if (result) {
+                this.setState({isShowTopHotWebSite: true, topHotWebSite: result.topHotWebSite})
+            }
+        })
+
     }
 
 
@@ -199,15 +215,12 @@ class Admin extends Component {
 
                         })}
                     </div>
-
-                    
                         <h4 style={{ margin: '16px 0' }}>热点网站:</h4>
-                        <div>
-                        <Tag color="#f50">百度新闻</Tag>
-                        <Tag color="#2db7f5">#2db7f5</Tag>
-                        <Tag color="#87d068">#87d068</Tag>
-                        <Tag color="#108ee9">#108ee9</Tag>
-                        </div>
+                    <div>
+                        { this.state.isShowTopHotWebSite && this.state.topHotWebSite.map((item, i) => {
+                            return <Tag key={i} color={item.color}>{item.name}</Tag>
+                        })}
+                    </div>
                     
                     <h4 style={{ margin: '16px 0' } }>热点词汇:</h4>
                     <WordCloud></WordCloud>
