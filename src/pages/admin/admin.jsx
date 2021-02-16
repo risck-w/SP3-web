@@ -135,14 +135,14 @@ class Admin extends Component {
         this.props.form.validateFields( async (err, values) => {
             if(!err){
                 try {
-                    if (this.state.hotWebSite && this.state.isShowHotWebSite) {
-                        const hotWebSite = this.state.hotWebSite
-                        const doname = _.find(hotWebSite, {'name': values.url})
-                        if (doname) {
-                            values.url = doname.url
-                        }
+                    // if (this.state.hotWebSite && this.state.isShowHotWebSite) {
+                    //     const hotWebSite = this.state.hotWebSite
+                    //     const doname = _.find(hotWebSite, {'name': values.url})
+                    //     if (doname) {
+                    //         values.url = doname.url
+                    //     }
 
-                    }
+                    // }
                     const result = await reqCraw(values)
                     if (result.code === 0 && result.data){
                         this.setState({
@@ -181,7 +181,7 @@ class Admin extends Component {
                 <Form  onSubmit={ this.handleSubmit }>
                     
                     <Form.Item>
-                        { getFieldDecorator('url', { valuePropName: 'checked', 'rules': [{required: true, message: '解析地址不能为空'}]})(
+                        { getFieldDecorator('url', { valuePropName: 'checked', 'rules': [{required: true, message: '检索词不能为空'}]})(
                             <Input className='sp3-form-input' placeholder='实时热点搜索' />
                         )}
                         <Button type="primary" htmlType="submit">

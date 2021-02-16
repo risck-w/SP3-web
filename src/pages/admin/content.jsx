@@ -33,11 +33,13 @@ export default class ContentLeft extends Component {
     }
 
     render(){
-        let size = 15
+        let size = 10
         return <div>
             { this.state.hotNews.length > 0 && _.chunk(this.state.hotNews, size)[this.state.pageNumber].map((item, i)=> {
                 return <div key={i} className='c-container'>
+                    <a href={item.req_url}>{item.req_url}</a>
                     <h3><a href={item.url} className="t">{item.title}</a></h3>
+                    来源：{item.res_name}  更新时间：{item.updated_dt}
                 
                 </div>
 
