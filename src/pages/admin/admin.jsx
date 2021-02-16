@@ -3,6 +3,7 @@ import storageUtils from '../../utils/storageUtils'
 import { Redirect } from 'react-router-dom'
 import { Divider, Form, Radio, Button, Input} from 'antd'
 import { message, Tag } from 'antd'
+import { notification } from 'antd'
 import './admin.less'
 import { reqCraw, reqHotWebSite, reqTopHotWebSite } from '../../api'
 import { UUID } from '../../utils/baseUtils'
@@ -92,7 +93,8 @@ class Admin extends Component {
             formInput: null,
             checked: true,
             hotNews: {},
-            uuid: null
+            uuid: null,
+            loading: false
         }
     }
 
@@ -128,6 +130,34 @@ class Admin extends Component {
 
     }
 
+    enterLoading = async () => {
+        let description = null
+        this.setState({loading: true})
+        this.state.hotWebSite.map(async (item) => {
+            try {
+                const data = {
+                    url: item.url,
+                    parseType: item.pdt_type,
+                    search: 1
+                }
+                const result = await reqCraw(data)
+                if (result.status === 0) {
+                    description = '《'+item.name+ '》加入爬取队列成功, 正在爬取...' 
+                    notification.open({
+                        key:this.key,
+                        message: '消息通知',
+                        description: description,
+                        duration: 3
+                      });
+                }
+                                     
+            } catch (err){
+                message.error(err)
+            }
+        })
+        this.setState({loading: false})
+
+    };
 
     handleSubmit = (e) => {
         // 阻止默认事件
@@ -135,14 +165,6 @@ class Admin extends Component {
         this.props.form.validateFields( async (err, values) => {
             if(!err){
                 try {
-                    // if (this.state.hotWebSite && this.state.isShowHotWebSite) {
-                    //     const hotWebSite = this.state.hotWebSite
-                    //     const doname = _.find(hotWebSite, {'name': values.url})
-                    //     if (doname) {
-                    //         values.url = doname.url
-                    //     }
-
-                    // }
                     const result = await reqCraw(values)
                     if (result.code === 0 && result.data){
                         this.setState({
@@ -215,6 +237,9 @@ class Admin extends Component {
 
                         })}
                     </div>
+                    { this.state.isShowHotWebSite && 
+                        <Button type="primary" size="small" loading={this.state.loading} onClick={this.enterLoading} block>一键添加</Button>
+                    }
                         <h4 style={{ margin: '16px 0' }}>热点网站:</h4>
                     <div>
                         { this.state.isShowTopHotWebSite && this.state.topHotWebSite.map((item, i) => {
