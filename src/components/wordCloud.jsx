@@ -53,6 +53,7 @@ export default class WordCloud extends Component {
                 gridSize: 1,
                 sizeRange: [12, 55],
                 rotationRange: [-45, 0, 45, 90],
+                layoutAnimation:true,
                 textStyle: {
                   normal: {
                     color: function () {

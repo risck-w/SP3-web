@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import storageUtils from '../../utils/storageUtils'
 import { Redirect } from 'react-router-dom'
-import { Divider, Form, Radio, Button, Input} from 'antd'
+import { Divider, Form, Radio, Badge, Icon, Empty, Button, Input} from 'antd'
 import { message, Tag } from 'antd'
 import { notification } from 'antd'
 import './admin.less'
@@ -94,7 +94,9 @@ class Admin extends Component {
             checked: true,
             hotNews: {},
             uuid: null,
-            loading: false
+            loading: false,
+            isShowEmpty: true,
+            emptyDescription:null
         }
     }
 
@@ -165,13 +167,20 @@ class Admin extends Component {
         this.props.form.validateFields( async (err, values) => {
             if(!err){
                 try {
+                    values.parseType = 'news'
                     const result = await reqCraw(values)
-                    if (result.code === 0 && result.data){
+                    if (result.code === 0 && result.data && result.data.length > 0){
                         this.setState({
                             uuid: UUID(),
-                            hotNews: result.data
+                            hotNews: result.data,
+                            isShowEmpty: false
                         })
-                    }                      
+                    } else {
+                        this.setState({
+                            isShowEmpty: true,
+                            emptyDescription:'未检索到相应的数据'
+                        })
+                    }                     
                 } catch (err){
                     message.error(err)
                 }
@@ -210,7 +219,7 @@ class Admin extends Component {
                             搜索
                         </Button>
                     </Form.Item>
-                    <Form.Item>
+                    {/* <Form.Item>
                         { getFieldDecorator("parseType", { initialValue: "news" })(
                             <Radio.Group>
                             <Radio value="news">新闻</Radio>
@@ -219,10 +228,12 @@ class Admin extends Component {
                             <Radio value="music">音乐</Radio>
                             </Radio.Group>
                         )}  
-                    </Form.Item>
+                    </Form.Item> */}
                 </Form>
                 </div>
                 <div id='content_left'>
+                    {this.state.isShowEmpty && <Empty description={this.state.emptyDescription}/>}
+                    {this.state.isShowEmpty && this.state.emptyDescription && this.state.uuid !== null && '历史新闻'}
                     <ContentLeft
                         id={this.state.uuid}
                         hotNews={this.state.hotNews}
@@ -247,7 +258,7 @@ class Admin extends Component {
                         })}
                     </div>
                     
-                    <h4 style={{ margin: '16px 0' } }>热点词汇:</h4>
+                    <h4 style={{ margin: '16px 0' } }>热点词汇:  <Badge count={0} dot><Icon type="notification" /></Badge></h4>
                     <WordCloud></WordCloud>
 
                 </div>
