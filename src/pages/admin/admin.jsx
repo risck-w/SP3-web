@@ -167,7 +167,6 @@ class Admin extends Component {
         this.props.form.validateFields( async (err, values) => {
             if(!err){
                 try {
-                    values.parseType = 'news'
                     const result = await reqCraw(values)
                     if (result.code === 0 && result.data && result.data.length > 0){
                         this.setState({
@@ -219,16 +218,14 @@ class Admin extends Component {
                             搜索
                         </Button>
                     </Form.Item>
-                    {/* <Form.Item>
+                    <Form.Item>
                         { getFieldDecorator("parseType", { initialValue: "news" })(
                             <Radio.Group>
                             <Radio value="news">新闻</Radio>
-                            <Radio value="vod">点播</Radio>
-                            <Radio value="live">直播</Radio>
-                            <Radio value="music">音乐</Radio>
+                            <Radio value="website">网站</Radio>
                             </Radio.Group>
                         )}  
-                    </Form.Item> */}
+                    </Form.Item>
                 </Form>
                 </div>
                 <div id='content_left'>
