@@ -17,3 +17,9 @@ import ajax from './ajax'
  export const reqCraw = (data) => ajax('/craw', data, 'GET')
 
  export const reqRank = () => ajax('/pageRank', null, 'GET')
+
+ export const reqHotWebSite = () => ajax('/hotWebSite', null, 'GET')
+
+ export const reqWordCloud = () => ajax('/wordCloud', null, 'GET')
+
+ export const reqTopHotWebSite = () => ajax('/topHotWebSite', null, 'GET')
