@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import './login.less'
-import logo from './images/logo.png'
 import { Form, Icon, Input, Button} from 'antd';
+import Header from '../header/header'
 import {reqLogin} from '../../api'
 import { message } from 'antd'
 import storageUtils from '../../utils/storageUtils'
@@ -11,37 +11,12 @@ import { Redirect } from 'react-router-dom';
  * 登录的路由界面
  */
 
- class Login extends Component {
+const Login = () => {
 
-    handleSubmit = (event) => {
+    const [form] = Form.useForm()
 
-        // // 组织事件的默认行为， 解决发生canceled状态的请求
-        event.preventDefault();
-
-        // 获取表单项输入数据
-        this.props.form.validateFields(async (err, user) => {
-            if(!err) {
-                const {username, password} = user
-                const result = await reqLogin(username, password)
-                if (result.status === 0){
-                    // 登录成功
-                    message.success('登录成功')
-                    // 保存对象
-                    storageUtils.saveUser(result)
-                    // this.props.history.push和repalce的区别是是否需要回退
-                    this.props.history.replace('/')
-                } else {
-                    // 登录失败
-                    message.error(result.message)
-                }
-            } else {
-                console.log('检验失败')
-            }
-        });
-    }
     // 对密码进行自定义验证
-    validatorPwd = (rule, value, callback) => {
-        console.log(rule, value)
+    const validatorPwd = (rule, value, callback) => {
         if (!value) {
             callback('密码不能为空!')
         } else if (value.length < 8) {
@@ -53,67 +28,91 @@ import { Redirect } from 'react-router-dom';
         }
         callback()
     }
+    const user = storageUtils.getUser()
+    if (user && user._id) {
+        return <Redirect to='/' />
+    }
 
-    render(){
-
-        const user = storageUtils.getUser()
-        if (user && user._id) {
-            return <Redirect to='/' />
+    const onFinish = async (values) => {
+        console.log(values)
+        const {username, password} = values
+        const result = await reqLogin(username, password)
+        if (result.status === 0){
+            // 登录成功
+            message.success('登录成功')
+            // 保存对象
+            storageUtils.saveUser(result)
+            // this.props.history.push和repalce的区别是是否需要回退
+            this.props.history.replace('/')
+        } else {
+            // 登录失败
+            message.error(result.message)
         }
+    }
 
-        const { getFieldDecorator } = this.props.form;
+    const onFinishFailed = (errorInfo) => {
+        if (errorInfo) {
+            message.error(errorInfo)
+        }
+    }
 
-        return (
-            <div className="login">
-                <header className="login-header">
-                    <img src={ logo } alt=""></img>
-                    <h1>SiteParse3：后台管理系统</h1>
-                </header>
-                <section className="login-content">
-                    <h2>用户登录</h2>
-                    <Form onSubmit={this.handleSubmit} className="login-form">
-                        <Form.Item>
-                        {getFieldDecorator('username', {
-                            // 声明式验证，直接使用别人定义好的验证规则进行验证
-                            'rules': [
-                                {required: true, whitespace: true, message: '用户名必须输入'},
-                                {min: 4, message: '用户名至少4位'},
-                                {max: 12, message: '用户名最多12位'},
-                                {pattern: /^[a-zA-Z0-9_]+$/, message: '用户名必须是英文、数字或下划线组成'}
+    return (
+        <div className="login">
+            <Header></Header>
+            <section className="login-content">
+                <h2>用户登录</h2>
+                <Form 
+                    form={form}
+                    className="login-form" 
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
+                    autoComplete="off"
+                >
+                    <Form.Item
+                    name='username'
+                        rules={[
+                            {required: true, whitespace: true, message: '用户名必须输入'},
+                            {min: 4, message: '用户名至少4位'},
+                            {max: 12, message: '用户名最多12位'},
+                            {pattern: /^[a-zA-Z0-9_]+$/, message: '用户名必须是英文、数字或下划线组成'}
+                        ]
+                    }>
+                        <Input
+                            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            placeholder="用户名"
+                        />
+                    )}
+                    </Form.Item>
+                    <Form.Item
+                        name="password"
+                        rules={[
+                                {
+                                    validator: validatorPwd
+                                }
                             ]
-                        })(
+                        }
+                        hasFeedback
+                    >
                             <Input
-                                prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                                placeholder="用户名"
+                                prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                                type="password"
+                                placeholder="密码"
                             />
-                        )}
-                        </Form.Item>
-                        <Form.Item>
-                            { getFieldDecorator('password', {
-                                'rules': [
-                                    {
-                                        validator: this.validatorPwd
-                                    }
-                                ]
-                            })(
-                                <Input
-                                    prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                                    type="password"
-                                    placeholder="密码"
-                                />
-                            ) }
-                        </Form.Item>
+                        ) }
+                    </Form.Item>
 
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" className="login-form-button">
-                            登录
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </section>
-            </div>
-        )
-     }
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" className="login-form-button">
+                        登录
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </section>
+        </div>
+    )
+
+
+
  }
 
 /*
@@ -139,8 +138,8 @@ import { Redirect } from 'react-router-dom';
  * 包装Form组件生成一个新的组件：Form(Login)
  * 新组件会向Form组件传递一个强大的对象属性：form
  */
-const WrapLogin = Form.create()(Login)
-export default WrapLogin
+// const WrapLogin = Form.create()(Login)
+export default Login
  /**
   * 1、前台表单验证
   * 2、收集表单输入数据

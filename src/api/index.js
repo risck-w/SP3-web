@@ -3,6 +3,11 @@
  */
 
 import ajax from './ajax'
+import requestFun from './fetch'
+import qs from 'qs'
+
+const { stringify } = qs
+const { post, get } = requestFun
 
  // 登录
 //  export function reqLogin(username, password) {
@@ -23,3 +28,15 @@ import ajax from './ajax'
  export const reqWordCloud = () => ajax('/wordCloud', null, 'GET')
 
  export const reqTopHotWebSite = () => ajax('/topHotWebSite', null, 'GET')
+
+ export const reqAIAgentSearch = (data) => ajax('/AIAgentSearch', data, 'GET')
+
+ // fetch AI搜索
+ export async function FetchAIContent(params, option={}) {
+     return get(`/AIAgentSearch?${stringify(params)}`, option)
+ }
+
+ // Post fetch AI搜索
+ export async function PostFetchAIContent(params, option={}) {
+    return post('/AIAgentSearch', params, option,)
+}

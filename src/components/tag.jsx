@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
-import { Tag, message } from 'antd'
+import { Tag } from 'antd'
+import './tag.less'
 import { notification } from 'antd';
 import  { reqCraw } from '../api'
 const { CheckableTag } = Tag;

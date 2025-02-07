@@ -1,9 +1,7 @@
 import React, {Component} from 'react'
-import echarts from 'echarts'
 import 'echarts-wordcloud'
 import ReactEcharts from 'echarts-for-react'
 import {reqWordCloud} from '../api'
-import { UUID } from '../utils/baseUtils'
 
 export default class WordCloud extends Component {
     constructor(props){
@@ -43,7 +41,7 @@ export default class WordCloud extends Component {
 
     wordCloudOption(){
         let option = {
-            backgroundColor: "#fff",
+            backgroundColor: "rgba(21, 20, 13, 0)",
             tooltip: {
               pointFormat: "{series.name}: <b>{point.percentage:.1f}%</b>"
             },
@@ -71,6 +69,7 @@ export default class WordCloud extends Component {
                 },
                 left: "center",
                 top: "center",
+                //color: '#fff',
                 right: null,
                 bottom: null,
                 width: "90%",

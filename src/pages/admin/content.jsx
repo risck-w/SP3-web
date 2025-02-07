@@ -1,8 +1,9 @@
 import React, {Component} from 'react'
-import {UUID} from '../../utils/baseUtils'
+import UUID from '../../utils/baseUtils.jsx'
 import './content.less'
 import {Pagination} from 'antd'
 import _ from 'lodash'
+import { ConsoleSqlOutlined } from '@ant-design/icons'
 
 
 export default class ContentLeft extends Component {
@@ -15,13 +16,11 @@ export default class ContentLeft extends Component {
         }
     }
 
-    UNSAFE_componentWillReceiveProps(nextprops) {
-        if (this.state.uuid !== nextprops.id) {
-            this.setState({
-                uuid: nextprops.id,
-                hotNews: nextprops.hotNews
-            })
-        } 
+    UNSAFE_componentWillReceiveProps(nextprops) { 
+        this.setState({
+            uuid: nextprops.id,
+            hotNews: nextprops.hotNews
+        })
     }
 
     onChange = (pageNumber) => {
